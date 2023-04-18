@@ -29,7 +29,8 @@
     "react-scripts": "^5.0.1",
     "styled-components": "^5.3.5",
     "typescript": "^4.7.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "write-excel-file": "^1.4.25"
   },
   "scripts": {
     "start": "react-scripts start",

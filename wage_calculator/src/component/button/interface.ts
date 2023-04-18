@@ -39,7 +39,6 @@ export interface CalculateWageButtonProps {
   lateNightWorkMultiplier: number;
   holidayAllowanceMinimumWorkTime: number;
   weeklyWorkingDays: number;
-  downloadWorkerSchedule(): any;
 }
 
 export interface ResetScheduleButtonProps {

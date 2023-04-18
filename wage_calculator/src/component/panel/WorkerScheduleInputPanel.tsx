@@ -15,25 +15,6 @@ import { theme } from "../../theme/theme";
 import { toPng } from "html-to-image";
 
 export const WorkerScheduleInputPanel: React.FC = () => {
-  const printRef = React.useRef<HTMLDivElement>(null);
-  const downloadWorkerSchedule = () => {
-    if (printRef.current === null) {
-      console.log("It was null");
-      return;
-    }
-
-    toPng(printRef.current, { cacheBust: true })
-      .then((dataUrl) => {
-        const link = document.createElement("a");
-        link.download = "아르바이트생 근무표.png";
-        link.href = dataUrl;
-        link.click();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const [loading, setLoading] = useState(true);
   const [uid, setUid] = useState("");
 
@@ -152,324 +133,322 @@ export const WorkerScheduleInputPanel: React.FC = () => {
       <Box padding={2} height="auto" bgcolor={theme.palette.background.default}>
         <Typography variant="h5">아르바이트생 근무표 입력</Typography>
         <Divider />
-        <div ref={printRef}>
-          {/* 리스트 제목 */}
-          <Box display="flex" marginLeft="50px" marginTop={2}>
-            <Box
-              width={120}
-              minWidth={120}
-              bgcolor={theme.palette.background.paper}
-              border={1}
-            >
+        {/* 리스트 제목 */}
+        <Box display="flex" marginLeft="50px" marginTop={2}>
+          <Box
+            width={120}
+            minWidth={120}
+            bgcolor={theme.palette.background.paper}
+            border={1}
+          >
+            <Typography variant="h6" align="center" fontWeight="bold">
+              이름
+            </Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={400 - 1}
+            bgcolor={theme.palette.background.paper}
+          >
+            <Box width={1 / 6} border={1}>
               <Typography variant="h6" align="center" fontWeight="bold">
-                이름
+                1주
               </Typography>
             </Box>
-            <Box
-              display="flex"
-              width={400 - 1}
-              bgcolor={theme.palette.background.paper}
-            >
-              <Box width={1 / 6} border={1}>
-                <Typography variant="h6" align="center" fontWeight="bold">
-                  1주
-                </Typography>
-              </Box>
-              <Box width={1 / 6} border={1}>
-                <Typography variant="h6" align="center" fontWeight="bold">
-                  2주
-                </Typography>
-              </Box>
-              <Box width={1 / 6} border={1}>
-                <Typography variant="h6" align="center" fontWeight="bold">
-                  3주
-                </Typography>
-              </Box>
-              <Box width={1 / 6} border={1}>
-                <Typography variant="h6" align="center" fontWeight="bold">
-                  4주
-                </Typography>
-              </Box>
-              <Box width={1 / 6} border={1}>
-                <Typography variant="h6" align="center" fontWeight="bold">
-                  5주
-                </Typography>
-              </Box>
-              <Box width={1 / 6} border={1}>
-                <Typography variant="h6" align="center" fontWeight="bold">
-                  6주
-                </Typography>
-              </Box>
-            </Box>
-            <Box
-              width={100}
-              minWidth={100}
-              bgcolor={theme.palette.background.paper}
-              border={1}
-            >
+            <Box width={1 / 6} border={1}>
               <Typography variant="h6" align="center" fontWeight="bold">
-                총합 근무 시간 1
+                2주
               </Typography>
             </Box>
-            <Box
-              display="flex"
-              width={200}
-              minWidth={200}
-              bgcolor={theme.palette.background.paper}
-            >
-              <Box width={90} border={1}>
-                <Typography variant="h6" align="center" fontWeight="bold">
-                  낮 근무 시간
-                </Typography>
-              </Box>
-              <Box width={110} border={1}>
-                <Typography variant="h6" align="center" fontWeight="bold">
-                  야간 근무 시간
-                </Typography>
-              </Box>
-            </Box>
-            <Box
-              width={100}
-              minWidth={100}
-              bgcolor={theme.palette.background.paper}
-              border={1}
-            >
+            <Box width={1 / 6} border={1}>
               <Typography variant="h6" align="center" fontWeight="bold">
-                총합 근무 시간 2
+                3주
+              </Typography>
+            </Box>
+            <Box width={1 / 6} border={1}>
+              <Typography variant="h6" align="center" fontWeight="bold">
+                4주
+              </Typography>
+            </Box>
+            <Box width={1 / 6} border={1}>
+              <Typography variant="h6" align="center" fontWeight="bold">
+                5주
+              </Typography>
+            </Box>
+            <Box width={1 / 6} border={1}>
+              <Typography variant="h6" align="center" fontWeight="bold">
+                6주
               </Typography>
             </Box>
           </Box>
+          <Box
+            width={100}
+            minWidth={100}
+            bgcolor={theme.palette.background.paper}
+            border={1}
+          >
+            <Typography variant="h6" align="center" fontWeight="bold">
+              총합 근무 시간 1
+            </Typography>
+          </Box>
+          <Box
+            display="flex"
+            width={200}
+            minWidth={200}
+            bgcolor={theme.palette.background.paper}
+          >
+            <Box width={90} border={1}>
+              <Typography variant="h6" align="center" fontWeight="bold">
+                낮 근무 시간
+              </Typography>
+            </Box>
+            <Box width={110} border={1}>
+              <Typography variant="h6" align="center" fontWeight="bold">
+                야간 근무 시간
+              </Typography>
+            </Box>
+          </Box>
+          <Box
+            width={100}
+            minWidth={100}
+            bgcolor={theme.palette.background.paper}
+            border={1}
+          >
+            <Typography variant="h6" align="center" fontWeight="bold">
+              총합 근무 시간 2
+            </Typography>
+          </Box>
+        </Box>
 
-          {/* 리스트 값 */}
-          <List sx={{ marginTop: -1 }}>
-            {workers.map((info, i) => (
-              <Box key={i} display="flex" width="100%" height={50}>
-                {/* 번호 */}
+        {/* 리스트 값 */}
+        <List sx={{ marginTop: -1 }}>
+          {workers.map((info, i) => (
+            <Box key={i} display="flex" width="100%" height={50}>
+              {/* 번호 */}
+              <Box
+                width={50}
+                minWidth={50}
+                bgcolor={theme.palette.background.default}
+                paddingTop={1}
+              >
+                <Typography variant="h6" align="center" fontWeight="bold">
+                  {i}
+                </Typography>
+              </Box>
+
+              {/* 이름 */}
+              <Box display="flex">
                 <Box
-                  width={50}
-                  minWidth={50}
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  width={120}
                   bgcolor={theme.palette.background.default}
-                  paddingTop={1}
+                  border={1}
                 >
-                  <Typography variant="h6" align="center" fontWeight="bold">
-                    {i}
+                  <Typography variant="h6" align="center">
+                    {info.name}
+                  </Typography>
+                </Box>
+                {/* 주별 시간 1 */}
+                <Box
+                  display="flex"
+                  width={400 - 1}
+                  bgcolor={theme.palette.background.default}
+                >
+                  <Box
+                    width={1 / 6}
+                    border={1}
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        timeString={workers[i].weeklyHours[0]}
+                        workerIndex={i}
+                        timeIndex={0}
+                        handleInsertTime={handleInsertWeeklyTime}
+                      />
+                    </Box>
+                  </Box>
+                  <Box
+                    width={1 / 6}
+                    border={1}
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        timeString={workers[i].weeklyHours[1]}
+                        workerIndex={i}
+                        timeIndex={1}
+                        handleInsertTime={handleInsertWeeklyTime}
+                      />
+                    </Box>
+                  </Box>
+                  <Box
+                    width={1 / 6}
+                    border={1}
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        timeString={workers[i].weeklyHours[2]}
+                        workerIndex={i}
+                        timeIndex={2}
+                        handleInsertTime={handleInsertWeeklyTime}
+                      />
+                    </Box>
+                  </Box>
+                  <Box
+                    width={1 / 6}
+                    border={1}
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        timeString={workers[i].weeklyHours[3]}
+                        workerIndex={i}
+                        timeIndex={3}
+                        handleInsertTime={handleInsertWeeklyTime}
+                      />
+                    </Box>
+                  </Box>
+                  <Box
+                    width={1 / 6}
+                    border={1}
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        timeString={workers[i].weeklyHours[4]}
+                        workerIndex={i}
+                        timeIndex={4}
+                        handleInsertTime={handleInsertWeeklyTime}
+                      />
+                    </Box>
+                  </Box>
+                  <Box
+                    width={1 / 6}
+                    border={1}
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        timeString={workers[i].weeklyHours[5]}
+                        workerIndex={i}
+                        timeIndex={5}
+                        handleInsertTime={handleInsertWeeklyTime}
+                      />
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* 총합 시간 1 */}
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  width={100}
+                  bgcolor={theme.palette.background.default}
+                  border={1}
+                >
+                  <Typography variant="body1" align="center">
+                    {calculateTotalHours(workers[i].weeklyHours)} 시간
                   </Typography>
                 </Box>
 
-                {/* 이름 */}
-                <Box display="flex">
+                {/* 낮 야간 시간 */}
+                <Box
+                  display="flex"
+                  width={200}
+                  bgcolor={theme.palette.background.default}
+                >
                   <Box
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="center"
-                    width={120}
-                    bgcolor={theme.palette.background.default}
+                    width={90}
                     border={1}
-                  >
-                    <Typography variant="h6" align="center">
-                      {info.name}
-                    </Typography>
-                  </Box>
-                  {/* 주별 시간 1 */}
-                  <Box
                     display="flex"
-                    width={400 - 1}
-                    bgcolor={theme.palette.background.default}
-                  >
-                    <Box
-                      width={1 / 6}
-                      border={1}
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <InsertTimeButton
-                          timeString={workers[i].weeklyHours[0]}
-                          workerIndex={i}
-                          timeIndex={0}
-                          handleInsertTime={handleInsertWeeklyTime}
-                        />
-                      </Box>
-                    </Box>
-                    <Box
-                      width={1 / 6}
-                      border={1}
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <InsertTimeButton
-                          timeString={workers[i].weeklyHours[1]}
-                          workerIndex={i}
-                          timeIndex={1}
-                          handleInsertTime={handleInsertWeeklyTime}
-                        />
-                      </Box>
-                    </Box>
-                    <Box
-                      width={1 / 6}
-                      border={1}
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <InsertTimeButton
-                          timeString={workers[i].weeklyHours[2]}
-                          workerIndex={i}
-                          timeIndex={2}
-                          handleInsertTime={handleInsertWeeklyTime}
-                        />
-                      </Box>
-                    </Box>
-                    <Box
-                      width={1 / 6}
-                      border={1}
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <InsertTimeButton
-                          timeString={workers[i].weeklyHours[3]}
-                          workerIndex={i}
-                          timeIndex={3}
-                          handleInsertTime={handleInsertWeeklyTime}
-                        />
-                      </Box>
-                    </Box>
-                    <Box
-                      width={1 / 6}
-                      border={1}
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <InsertTimeButton
-                          timeString={workers[i].weeklyHours[4]}
-                          workerIndex={i}
-                          timeIndex={4}
-                          handleInsertTime={handleInsertWeeklyTime}
-                        />
-                      </Box>
-                    </Box>
-                    <Box
-                      width={1 / 6}
-                      border={1}
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <InsertTimeButton
-                          timeString={workers[i].weeklyHours[5]}
-                          workerIndex={i}
-                          timeIndex={5}
-                          handleInsertTime={handleInsertWeeklyTime}
-                        />
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  {/* 총합 시간 1 */}
-                  <Box
-                    display="flex"
-                    flexDirection="column"
                     justifyContent="center"
-                    width={100}
-                    bgcolor={theme.palette.background.default}
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        timeString={workers[i].dayNightHours[0]}
+                        workerIndex={i}
+                        timeIndex={0}
+                        handleInsertTime={handleInsertDayNightTime}
+                      />
+                    </Box>
+                  </Box>
+                  <Box
+                    width={110}
                     border={1}
-                  >
-                    <Typography variant="body1" align="center">
-                      {calculateTotalHours(workers[i].weeklyHours)} 시간
-                    </Typography>
-                  </Box>
-
-                  {/* 낮 야간 시간 */}
-                  <Box
                     display="flex"
-                    width={200}
-                    bgcolor={theme.palette.background.default}
-                  >
-                    <Box
-                      width={90}
-                      border={1}
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <InsertTimeButton
-                          timeString={workers[i].dayNightHours[0]}
-                          workerIndex={i}
-                          timeIndex={0}
-                          handleInsertTime={handleInsertDayNightTime}
-                        />
-                      </Box>
-                    </Box>
-                    <Box
-                      width={110}
-                      border={1}
-                      display="flex"
-                      justifyContent="center"
-                    >
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                      >
-                        <InsertTimeButton
-                          timeString={workers[i].dayNightHours[1]}
-                          workerIndex={i}
-                          timeIndex={1}
-                          handleInsertTime={handleInsertDayNightTime}
-                        />
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  {/* 총합 시간 2 */}
-                  <Box
-                    display="flex"
-                    flexDirection="column"
                     justifyContent="center"
-                    width={100}
-                    bgcolor={theme.palette.background.default}
-                    border={1}
                   >
-                    <Typography variant="body1" align="center">
-                      {calculateTotalHours(workers[i].dayNightHours)} 시간
-                    </Typography>
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        timeString={workers[i].dayNightHours[1]}
+                        workerIndex={i}
+                        timeIndex={1}
+                        handleInsertTime={handleInsertDayNightTime}
+                      />
+                    </Box>
                   </Box>
                 </Box>
+
+                {/* 총합 시간 2 */}
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="center"
+                  width={100}
+                  bgcolor={theme.palette.background.default}
+                  border={1}
+                >
+                  <Typography variant="body1" align="center">
+                    {calculateTotalHours(workers[i].dayNightHours)} 시간
+                  </Typography>
+                </Box>
               </Box>
-            ))}
-          </List>
-        </div>
+            </Box>
+          ))}
+        </List>
         <Box display="flex" justifyContent="flex-end" marginTop={5} width={975}>
           <ResetScheduleButton handleResetSchedule={handleResetSchedule} />
           <CalculateWageButton
@@ -478,7 +457,7 @@ export const WorkerScheduleInputPanel: React.FC = () => {
             lateNightWorkMultiplier={+lateNightWorkMultiplier}
             holidayAllowanceMinimumWorkTime={+holidayAllowanceMinimumWorkTime}
             weeklyWorkingDays={+weeklyWorkingDays}
-            downloadWorkerSchedule={downloadWorkerSchedule}
+            // downloadWorkerSchedule={downloadWorkerSchedule}
           />
         </Box>
       </Box>

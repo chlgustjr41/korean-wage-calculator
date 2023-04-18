@@ -16,31 +16,169 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { theme } from "../../theme/theme";
 import { CalculateWageButtonProps } from "./interface";
 import { useState } from "react";
-import { toPng } from "html-to-image";
+import writeXlsxFile from "write-excel-file";
 
 const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
   props: CalculateWageButtonProps
 ) => {
-  const printRef = React.useRef<HTMLDivElement>(null);
-  const downloadWageCalculation = () => {
-    props.downloadWorkerSchedule();
+  async function generateExcelFile() {
+    const columns = [
+      { width: 5 },
+      { width: 10 },
+      { width: 15 },
+      { width: 15 },
+      { width: 15 },
+      { width: 15 },
+      { width: 15 },
+    ];
 
-    if (printRef.current === null) {
-      console.log("It was null");
-      return;
-    }
+    // Header
+    const HEADER_ROW: Object[] = [
+      {
+        value: "#",
+        fontWeight: "bold",
+        align: "center",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+      {
+        value: "이름",
+        fontWeight: "bold",
+        align: "center",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+      {
+        value: "주휴 수당 시간",
+        fontWeight: "bold",
+        align: "center",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+      {
+        value: "월급",
+        fontWeight: "bold",
+        align: "center",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+      {
+        value: "주휴 수당",
+        fontWeight: "bold",
+        align: "center",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+      {
+        value: "월급 + 주휴 수당",
+        fontWeight: "bold",
+        align: "center",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+      {
+        value: "비고",
+        fontWeight: "bold",
+        align: "center",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+    ];
 
-    toPng(printRef.current, { cacheBust: true })
-      .then((dataUrl) => {
-        const link = document.createElement("a");
-        link.download = "급여 계산 결과.png";
-        link.href = dataUrl;
-        link.click();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+    // Data Array
+    const data = [HEADER_ROW];
+
+    // Value
+    props.workers.map((info, i) => {
+      data.push([
+        {
+          value: (i + 1).toString(),
+          align: "center",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        },
+        {
+          value: info.name,
+          align: "center",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        },
+        {
+          value: calculateTotalholidayAllowanceTime(i),
+          align: "center",
+          format: "#,##0.00",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        },
+        {
+          value: calculateDayNightWage(i),
+          align: "right",
+          format: "#,##0",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        },
+        {
+          value: calculateTotalholidayAllowance(i),
+          align: "right",
+          format: "#,##0",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        },
+        {
+          value: calculateDayNightWage(i) + calculateTotalholidayAllowance(i),
+          align: "right",
+          format: "#,##0",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        },
+        {
+          value: "",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        },
+      ]);
+    });
+
+    // Empty Spacing
+    data.push([{}, {}, {}, {}, {}, {}, {}]);
+    data.push([
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        value: "총 급여",
+        fontWeight: "bold",
+        align: "center",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+    ]);
+    data.push([
+      {},
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        value: calculateTotalWage(),
+        align: "right",
+        format: "#,##0",
+        borderColor: "#C0C0C0",
+        borderStyle: "thin",
+      },
+    ]);
+
+    await writeXlsxFile(data, {
+      columns,
+      fileName: "급여 계산 결과.xlsx",
+      orientation: "landscape",
+      //#080808
+    });
+  }
 
   const [open, setOpen] = useState(false);
 
@@ -136,234 +274,232 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
         </DialogTitle>
 
         <DialogContent>
-          <div ref={printRef}>
-            <Box padding={1}>
-              {/* 리스트 제목 */}
-              <Box display="flex" marginLeft="50px" marginTop={2}>
-                {/* 이름 */}
-                <Box
-                  width={120}
-                  minWidth={120}
-                  // bgcolor={theme.palette.background.paper}
-                  bgcolor="white"
-                  border={1}
-                >
-                  <Typography variant="h6" align="center" fontWeight="bold">
-                    이름
-                  </Typography>
-                </Box>
-                {/* 평균 주휴 수당 시간 */}
-                <Box
-                  width={200}
-                  minWidth={200}
-                  // bgcolor={theme.palette.background.paper}
-                  bgcolor="white"
-                  border={1}
-                >
-                  <Typography variant="h6" align="center" fontWeight="bold">
-                    평균 주휴 수당 시간
-                  </Typography>
-                </Box>
-                {/* 월급 */}
-                <Box
-                  width={200}
-                  minWidth={200}
-                  // bgcolor={theme.palette.background.paper}
-                  bgcolor="white"
-                  border={1}
-                >
-                  <Typography variant="h6" align="center" fontWeight="bold">
-                    월급
-                  </Typography>
-                </Box>
-                {/* 주휴 수당 */}
-                <Box
-                  width={200}
-                  minWidth={200}
-                  // bgcolor={theme.palette.background.paper}
-                  bgcolor="white"
-                  border={1}
-                >
-                  <Typography variant="h6" align="center" fontWeight="bold">
-                    주휴 수당
-                  </Typography>
-                </Box>
-                {/* 월급 + 주휴 수당 */}
-                <Box
-                  width={200}
-                  minWidth={200}
-                  // bgcolor={theme.palette.background.paper}
-                  bgcolor="white"
-                  border={1}
-                >
-                  <Typography variant="h6" align="center" fontWeight="bold">
-                    월급 + 주휴 수당
-                  </Typography>
-                </Box>
-                {/* 비고 */}
-                <Box
-                  width={150}
-                  minWidth={150}
-                  // bgcolor={theme.palette.background.paper}
-                  bgcolor="white"
-                  border={1}
-                >
-                  <Typography variant="h6" align="center" fontWeight="bold">
-                    비고
-                  </Typography>
-                </Box>
+          <Box padding={1}>
+            {/* 리스트 제목 */}
+            <Box display="flex" marginLeft="50px" marginTop={2}>
+              {/* 이름 */}
+              <Box
+                width={120}
+                minWidth={120}
+                // bgcolor={theme.palette.background.paper}
+                bgcolor="white"
+                border={1}
+              >
+                <Typography variant="h6" align="center" fontWeight="bold">
+                  이름
+                </Typography>
               </Box>
+              {/* 평균 주휴 수당 시간 */}
+              <Box
+                width={200}
+                minWidth={200}
+                // bgcolor={theme.palette.background.paper}
+                bgcolor="white"
+                border={1}
+              >
+                <Typography variant="h6" align="center" fontWeight="bold">
+                  평균 주휴 수당 시간
+                </Typography>
+              </Box>
+              {/* 월급 */}
+              <Box
+                width={200}
+                minWidth={200}
+                // bgcolor={theme.palette.background.paper}
+                bgcolor="white"
+                border={1}
+              >
+                <Typography variant="h6" align="center" fontWeight="bold">
+                  월급
+                </Typography>
+              </Box>
+              {/* 주휴 수당 */}
+              <Box
+                width={200}
+                minWidth={200}
+                // bgcolor={theme.palette.background.paper}
+                bgcolor="white"
+                border={1}
+              >
+                <Typography variant="h6" align="center" fontWeight="bold">
+                  주휴 수당
+                </Typography>
+              </Box>
+              {/* 월급 + 주휴 수당 */}
+              <Box
+                width={200}
+                minWidth={200}
+                // bgcolor={theme.palette.background.paper}
+                bgcolor="white"
+                border={1}
+              >
+                <Typography variant="h6" align="center" fontWeight="bold">
+                  월급 + 주휴 수당
+                </Typography>
+              </Box>
+              {/* 비고 */}
+              <Box
+                width={150}
+                minWidth={150}
+                // bgcolor={theme.palette.background.paper}
+                bgcolor="white"
+                border={1}
+              >
+                <Typography variant="h6" align="center" fontWeight="bold">
+                  비고
+                </Typography>
+              </Box>
+            </Box>
 
-              {/* 리스트 값 */}
-              <List sx={{ marginTop: -1 }}>
-                {props.workers.map((info, i) => (
-                  <Box key={i} display="flex" width="100%" height={50}>
-                    {/* 번호 */}
-                    <Box
-                      width={50}
-                      minWidth={50}
-                      // bgcolor={theme.palette.background.default}
-                      bgcolor="white"
-                      paddingTop={1}
-                    >
-                      <Typography variant="h6" align="center" fontWeight="bold">
-                        {i}
-                      </Typography>
-                    </Box>
-                    {/* 이름 */}
-                    <Box display="flex">
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                        width={120}
-                        minWidth={120}
-                        // bgcolor={theme.palette.background.default}
-                        bgcolor="white"
-                        border={1}
-                      >
-                        <Typography variant="h6" align="center">
-                          {info.name}
-                        </Typography>
-                      </Box>{" "}
-                    </Box>
-                    {/* 총 주휴 수당 시간 */}
-                    <Box display="flex">
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                        width={200}
-                        minWidth={200}
-                        // bgcolor={theme.palette.background.default}
-                        bgcolor="white"
-                        border={1}
-                      >
-                        <Typography variant="h6" align="center">
-                          {calculateTotalholidayAllowanceTime(i).toFixed(2)}{" "}
-                          시간
-                        </Typography>
-                      </Box>
-                    </Box>
-                    {/* 월급 */}
-                    <Box display="flex">
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                        width={200}
-                        minWidth={200}
-                        // bgcolor={theme.palette.background.default}
-                        bgcolor="white"
-                        border={1}
-                      >
-                        <Typography variant="h6" align="center">
-                          {calculateDayNightWage(i).toFixed(2)} 원
-                        </Typography>
-                      </Box>
-                    </Box>
-                    {/* 주휴 수당 */}
-                    <Box display="flex">
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                        width={200}
-                        minWidth={200}
-                        // bgcolor={theme.palette.background.default}
-                        bgcolor="white"
-                        border={1}
-                      >
-                        <Typography variant="h6" align="center">
-                          {calculateTotalholidayAllowance(i).toFixed(2)} 원
-                        </Typography>
-                      </Box>
-                    </Box>
-                    {/* 월급 + 주휴 수당 */}
-                    <Box display="flex">
-                      <Box
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="center"
-                        width={200}
-                        minWidth={200}
-                        // bgcolor={theme.palette.background.default}
-                        bgcolor="white"
-                        border={1}
-                      >
-                        <Typography variant="h6" align="center">
-                          {(
-                            calculateDayNightWage(i) +
-                            calculateTotalholidayAllowance(i)
-                          ).toFixed(2)}{" "}
-                          원
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    {/* 비고 */}
+            {/* 리스트 값 */}
+            <List sx={{ marginTop: -1 }}>
+              {props.workers.map((info, i) => (
+                <Box key={i} display="flex" width="100%" height={50}>
+                  {/* 번호 */}
+                  <Box
+                    width={50}
+                    minWidth={50}
+                    // bgcolor={theme.palette.background.default}
+                    bgcolor="white"
+                    paddingTop={1}
+                  >
+                    <Typography variant="h6" align="center" fontWeight="bold">
+                      {i}
+                    </Typography>
+                  </Box>
+                  {/* 이름 */}
+                  <Box display="flex">
                     <Box
                       display="flex"
-                      width={150}
-                      minWidth={150}
+                      flexDirection="column"
+                      justifyContent="center"
+                      width={120}
+                      minWidth={120}
                       // bgcolor={theme.palette.background.default}
                       bgcolor="white"
                       border={1}
-                    />
+                    >
+                      <Typography variant="h6" align="center">
+                        {info.name}
+                      </Typography>
+                    </Box>{" "}
                   </Box>
-                ))}
-              </List>
-              <Box display="flex" flexDirection="column" marginLeft="980px">
-                <Box
-                  width={150}
-                  // bgcolor={theme.palette.background.paper}
-                  bgcolor="white"
-                  border={1}
-                >
-                  <Typography variant="h6" align="center" fontWeight="bold">
-                    총 급여
-                  </Typography>
+                  {/* 총 주휴 수당 시간 */}
+                  <Box display="flex">
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                      width={200}
+                      minWidth={200}
+                      // bgcolor={theme.palette.background.default}
+                      bgcolor="white"
+                      border={1}
+                    >
+                      <Typography variant="h6" align="center">
+                        {calculateTotalholidayAllowanceTime(i).toFixed(2)} 시간
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {/* 월급 */}
+                  <Box display="flex">
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                      width={200}
+                      minWidth={200}
+                      // bgcolor={theme.palette.background.default}
+                      bgcolor="white"
+                      border={1}
+                    >
+                      <Typography variant="h6" align="center">
+                        {calculateDayNightWage(i).toFixed(2)} 원
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {/* 주휴 수당 */}
+                  <Box display="flex">
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                      width={200}
+                      minWidth={200}
+                      // bgcolor={theme.palette.background.default}
+                      bgcolor="white"
+                      border={1}
+                    >
+                      <Typography variant="h6" align="center">
+                        {calculateTotalholidayAllowance(i).toFixed(2)} 원
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {/* 월급 + 주휴 수당 */}
+                  <Box display="flex">
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                      width={200}
+                      minWidth={200}
+                      // bgcolor={theme.palette.background.default}
+                      bgcolor="white"
+                      border={1}
+                    >
+                      <Typography variant="h6" align="center">
+                        {(
+                          calculateDayNightWage(i) +
+                          calculateTotalholidayAllowance(i)
+                        ).toFixed(2)}{" "}
+                        원
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* 비고 */}
+                  <Box
+                    display="flex"
+                    width={150}
+                    minWidth={150}
+                    // bgcolor={theme.palette.background.default}
+                    bgcolor="white"
+                    border={1}
+                  />
                 </Box>
-                <Box
-                  width={150}
-                  height={35}
-                  // bgcolor={theme.palette.background.default}
-                  bgcolor="white"
-                  border={1}
-                >
-                  <Typography variant="h6" align="center">
-                    {calculateTotalWage().toFixed(2)} 원
-                  </Typography>
-                </Box>
+              ))}
+            </List>
+            <Box display="flex" flexDirection="column" marginLeft="980px">
+              <Box
+                width={150}
+                // bgcolor={theme.palette.background.paper}
+                bgcolor="white"
+                border={1}
+              >
+                <Typography variant="h6" align="center" fontWeight="bold">
+                  총 급여
+                </Typography>
+              </Box>
+              <Box
+                width={150}
+                height={35}
+                // bgcolor={theme.palette.background.default}
+                bgcolor="white"
+                border={1}
+              >
+                <Typography variant="h6" align="center">
+                  {calculateTotalWage().toFixed(2)} 원
+                </Typography>
               </Box>
             </Box>
-          </div>
+          </Box>
         </DialogContent>
 
         <DialogActions>
           <Button
             variant="outlined"
-            onClick={downloadWageCalculation}
+            // onClick={downloadWageCalculation}
+            onClick={generateExcelFile}
             sx={{ textTransform: "none" }}
           >
             다운로드
