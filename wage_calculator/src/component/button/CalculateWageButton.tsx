@@ -11,6 +11,7 @@ import {
   Box,
   Typography,
   List,
+  Checkbox,
 } from "@mui/material/";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { theme } from "../../theme/theme";
@@ -21,19 +22,29 @@ import writeXlsxFile from "write-excel-file";
 const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
   props: CalculateWageButtonProps
 ) => {
-  async function generateExcelFile() {
-    const columns = [
-      { width: 5 },
-      { width: 10 },
-      { width: 15 },
-      { width: 15 },
-      { width: 15 },
-      { width: 15 },
-      { width: 15 },
-    ];
+  const [calculatedListDisplay, setCalculatedListDisplay] = useState({
+    holidayWageHour: true,
+    wage: true,
+    holidayWage: true,
+    totalWage: true,
+    note: true,
+  });
 
-    // Header
-    const HEADER_ROW: Object[] = [
+  const onChecklistChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCalculatedListDisplay({
+      ...calculatedListDisplay,
+      [event.target.name]: event.target.checked,
+    });
+  };
+
+  async function generateExcelFile() {
+    let checkedCount = 0;
+
+    // For cell column width setting
+    const columns = [{ width: 5 }, { width: 10 }];
+
+    // Header Row
+    const header_row: Object[] = [
       {
         value: "#",
         fontWeight: "bold",
@@ -48,49 +59,75 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
         borderColor: "#C0C0C0",
         borderStyle: "thin",
       },
-      {
+    ];
+
+    if (calculatedListDisplay.holidayWageHour) {
+      columns.push({ width: 15 });
+      header_row.push({
         value: "주휴 수당 시간",
         fontWeight: "bold",
         align: "center",
         borderColor: "#C0C0C0",
         borderStyle: "thin",
-      },
-      {
+      });
+
+      checkedCount++;
+    }
+    if (calculatedListDisplay.wage) {
+      columns.push({ width: 15 });
+      header_row.push({
         value: "월급",
         fontWeight: "bold",
         align: "center",
         borderColor: "#C0C0C0",
         borderStyle: "thin",
-      },
-      {
+      });
+
+      checkedCount++;
+    }
+    if (calculatedListDisplay.holidayWage) {
+      columns.push({ width: 15 });
+      header_row.push({
         value: "주휴 수당",
         fontWeight: "bold",
         align: "center",
         borderColor: "#C0C0C0",
         borderStyle: "thin",
-      },
-      {
+      });
+
+      checkedCount++;
+    }
+    if (calculatedListDisplay.totalWage) {
+      columns.push({ width: 15 });
+      header_row.push({
         value: "월급 + 주휴 수당",
         fontWeight: "bold",
         align: "center",
         borderColor: "#C0C0C0",
         borderStyle: "thin",
-      },
-      {
+      });
+
+      checkedCount++;
+    }
+    if (calculatedListDisplay.note) {
+      columns.push({ width: 15 });
+      header_row.push({
         value: "비고",
         fontWeight: "bold",
         align: "center",
         borderColor: "#C0C0C0",
         borderStyle: "thin",
-      },
-    ];
+      });
+
+      checkedCount++;
+    }
 
     // Data Array
-    const data = [HEADER_ROW];
+    const data = [header_row];
 
     // Value
     props.workers.map((info, i) => {
-      data.push([
+      const list_row: any = [
         {
           value: (i + 1).toString(),
           align: "center",
@@ -103,74 +140,86 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
           borderColor: "#C0C0C0",
           borderStyle: "thin",
         },
-        {
+      ];
+
+      if (calculatedListDisplay.holidayWageHour) {
+        list_row.push({
           value: calculateTotalholidayAllowanceTime(i),
           align: "center",
           format: "#,##0.00",
           borderColor: "#C0C0C0",
           borderStyle: "thin",
-        },
-        {
+        });
+      }
+      if (calculatedListDisplay.wage) {
+        list_row.push({
           value: calculateDayNightWage(i),
           align: "right",
           format: "#,##0",
           borderColor: "#C0C0C0",
           borderStyle: "thin",
-        },
-        {
+        });
+      }
+      if (calculatedListDisplay.holidayWage) {
+        list_row.push({
           value: calculateTotalholidayAllowance(i),
           align: "right",
           format: "#,##0",
           borderColor: "#C0C0C0",
           borderStyle: "thin",
-        },
-        {
+        });
+      }
+      if (calculatedListDisplay.totalWage) {
+        list_row.push({
           value: calculateDayNightWage(i) + calculateTotalholidayAllowance(i),
           align: "right",
           format: "#,##0",
           borderColor: "#C0C0C0",
           borderStyle: "thin",
-        },
-        {
+        });
+      }
+      if (calculatedListDisplay.note) {
+        list_row.push({
           value: "",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        });
+      }
+
+      data.push(list_row);
+    });
+
+    // Empty Spacing
+    const spacing = [{}, {}];
+    for (let i = 0; i < checkedCount - 1; i++) spacing.push({});
+    data.push([...spacing, {}]);
+
+    // Total Wage of all workers - condition: displayed only if total wage is checked or both of wage and holiday wage are checked
+    if (
+      calculatedListDisplay.totalWage ||
+      (calculatedListDisplay.wage && calculatedListDisplay.holidayWage)
+    ) {
+      data.push([
+        ...spacing,
+        {
+          value: "총 급여",
+          fontWeight: "bold",
+          align: "center",
           borderColor: "#C0C0C0",
           borderStyle: "thin",
         },
       ]);
-    });
-
-    // Empty Spacing
-    data.push([{}, {}, {}, {}, {}, {}, {}]);
-    data.push([
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {
-        value: "총 급여",
-        fontWeight: "bold",
-        align: "center",
-        borderColor: "#C0C0C0",
-        borderStyle: "thin",
-      },
-    ]);
-    data.push([
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      {
-        value: calculateTotalWage(),
-        align: "right",
-        format: "#,##0",
-        borderColor: "#C0C0C0",
-        borderStyle: "thin",
-      },
-    ]);
+      data.push([
+        ...spacing,
+        {
+          value: calculateTotalWage(),
+          align: "right",
+          format: "#,##0",
+          borderColor: "#C0C0C0",
+          borderStyle: "thin",
+        },
+      ]);
+    }
 
     await writeXlsxFile(data, {
       columns,
@@ -275,8 +324,80 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
 
         <DialogContent>
           <Box padding={1}>
-            {/* 리스트 제목 */}
+            {/* 리스트 체크 리스트 */}
             <Box display="flex" marginLeft="50px" marginTop={2}>
+              {/* 이름칸 - 공백 */}
+              <Box width={122} minWidth={122} />
+
+              {/* 평균 주휴 수당 시간 칸 */}
+              <Box
+                width={202}
+                minWidth={202}
+                display="flex"
+                justifyContent="center"
+              >
+                <Checkbox
+                  checked={calculatedListDisplay.holidayWageHour}
+                  onChange={onChecklistChange}
+                  name="holidayWageHour"
+                />
+              </Box>
+              {/* 월급 칸 */}
+              <Box
+                width={202}
+                minWidth={202}
+                display="flex"
+                justifyContent="center"
+              >
+                <Checkbox
+                  checked={calculatedListDisplay.wage}
+                  onChange={onChecklistChange}
+                  name="wage"
+                />
+              </Box>
+              {/* 주휴 수당 칸 */}
+              <Box
+                width={202}
+                minWidth={202}
+                display="flex"
+                justifyContent="center"
+              >
+                <Checkbox
+                  checked={calculatedListDisplay.holidayWage}
+                  onChange={onChecklistChange}
+                  name="holidayWage"
+                />
+              </Box>
+              {/* 월급 + 주휴 수당 칸 */}
+              <Box
+                width={202}
+                minWidth={202}
+                display="flex"
+                justifyContent="center"
+              >
+                <Checkbox
+                  checked={calculatedListDisplay.totalWage}
+                  onChange={onChecklistChange}
+                  name="totalWage"
+                />
+              </Box>
+              {/* 비고 칸 */}
+              <Box
+                width={152}
+                minWidth={152}
+                display="flex"
+                justifyContent="center"
+              >
+                <Checkbox
+                  checked={calculatedListDisplay.note}
+                  onChange={onChecklistChange}
+                  name="note"
+                />
+              </Box>
+            </Box>
+
+            {/* 리스트 제목 */}
+            <Box display="flex" marginLeft="50px">
               {/* 이름 */}
               <Box
                 width={120}
