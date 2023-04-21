@@ -268,7 +268,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       justifyContent="center"
                     >
                       <InsertTimeButton
-                        timeString={workers[i].weeklyHours[0]}
+                        type="Weekly"
+                        workerTimeInfo={workers[i].weeklyHours}
                         workerIndex={i}
                         timeIndex={0}
                         handleInsertTime={handleInsertWeeklyTime}
@@ -287,7 +288,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       justifyContent="center"
                     >
                       <InsertTimeButton
-                        timeString={workers[i].weeklyHours[1]}
+                        type="Weekly"
+                        workerTimeInfo={workers[i].weeklyHours}
                         workerIndex={i}
                         timeIndex={1}
                         handleInsertTime={handleInsertWeeklyTime}
@@ -306,7 +308,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       justifyContent="center"
                     >
                       <InsertTimeButton
-                        timeString={workers[i].weeklyHours[2]}
+                        type="Weekly"
+                        workerTimeInfo={workers[i].weeklyHours}
                         workerIndex={i}
                         timeIndex={2}
                         handleInsertTime={handleInsertWeeklyTime}
@@ -325,7 +328,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       justifyContent="center"
                     >
                       <InsertTimeButton
-                        timeString={workers[i].weeklyHours[3]}
+                        type="Weekly"
+                        workerTimeInfo={workers[i].weeklyHours}
                         workerIndex={i}
                         timeIndex={3}
                         handleInsertTime={handleInsertWeeklyTime}
@@ -344,7 +348,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       justifyContent="center"
                     >
                       <InsertTimeButton
-                        timeString={workers[i].weeklyHours[4]}
+                        type="Weekly"
+                        workerTimeInfo={workers[i].weeklyHours}
                         workerIndex={i}
                         timeIndex={4}
                         handleInsertTime={handleInsertWeeklyTime}
@@ -363,7 +368,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       justifyContent="center"
                     >
                       <InsertTimeButton
-                        timeString={workers[i].weeklyHours[5]}
+                        type="Weekly"
+                        workerTimeInfo={workers[i].weeklyHours}
                         workerIndex={i}
                         timeIndex={5}
                         handleInsertTime={handleInsertWeeklyTime}
@@ -404,7 +410,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       justifyContent="center"
                     >
                       <InsertTimeButton
-                        timeString={workers[i].dayNightHours[0]}
+                        type="DayNight"
+                        workerTimeInfo={workers[i].dayNightHours}
                         workerIndex={i}
                         timeIndex={0}
                         handleInsertTime={handleInsertDayNightTime}
@@ -423,7 +430,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       justifyContent="center"
                     >
                       <InsertTimeButton
-                        timeString={workers[i].dayNightHours[1]}
+                        type="DayNight"
+                        workerTimeInfo={workers[i].dayNightHours}
                         workerIndex={i}
                         timeIndex={1}
                         handleInsertTime={handleInsertDayNightTime}

@@ -22,7 +22,8 @@ export interface DeleteWorkerButtonProps {
 }
 
 export interface InsertTimeButtonProps {
-  timeString: string;
+  type: "Weekly" | "DayNight";
+  workerTimeInfo: string[];
   workerIndex: number;
   timeIndex: number;
   handleInsertTime(
