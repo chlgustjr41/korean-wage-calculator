@@ -15,7 +15,7 @@ import TabPanel from "../component/general/TabPanel";
 
 import { MainMenuPanel } from "../component/panel/MainMenuPanel";
 import { WorkerInfoPanel } from "../component/panel/WorkerInfoPanel";
-import { WorkerScheduleInputPanel } from "../component/panel/WorkerScheduleInputPanel";
+import { WorkerScheduleInput } from "../component/panel/WorkerScheduleInput";
 
 const CalculatorPage: React.FC = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -39,8 +39,6 @@ const CalculatorPage: React.FC = () => {
   return (
     <>
       <Box
-        width="100%"
-        height="auto"
         bgcolor={theme.palette.background.default}
       >
         <Fade in={true}>
@@ -85,7 +83,8 @@ const CalculatorPage: React.FC = () => {
                 <WorkerInfoPanel />
               </TabPanel>
               <TabPanel value={tabIndex} index={2}>
-                <WorkerScheduleInputPanel />
+                <WorkerScheduleInput />
+                {/* <WorkerScheduleInputPanel /> */}
               </TabPanel>
             </Box>
           </Box>

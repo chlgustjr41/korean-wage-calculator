@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useEffect, useCallback } from "react";
 import {
   Button,
   Dialog,
@@ -18,10 +18,13 @@ import { theme } from "../../theme/theme";
 import { CalculateWageButtonProps } from "./interface";
 import { useState } from "react";
 import writeXlsxFile from "write-excel-file";
+import { useBasicInfo } from "../../database/dataHook/useBasicInfo";
+import { useWorkerInfo } from "../../database/dataHook/useWorkerInfo";
 
-const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
-  props: CalculateWageButtonProps
-) => {
+const CalculateWageButton: React.FC<CalculateWageButtonProps> = () => {
+  const { data: basicInfo } = useBasicInfo()
+  const { data: workers, isLoading: isWorkersLoading } = useWorkerInfo()
+
   const [calculatedListDisplay, setCalculatedListDisplay] = useState({
     holidayWageHour: true,
     wage: true,
@@ -37,7 +40,9 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
     });
   };
 
-  async function generateExcelFile() {
+  const generateExcelFile = useCallback(async () => {
+    if (!workers) return undefined
+
     let checkedCount = 0;
 
     // For cell column width setting
@@ -126,7 +131,7 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
     const data = [header_row];
 
     // Value
-    props.workers.map((info, i) => {
+    workers.map((info, i) => {
       const list_row: any = [
         {
           value: (i + 1).toString(),
@@ -227,7 +232,7 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
       orientation: "landscape",
       //#080808
     });
-  }
+  }, [workers])
 
   const [open, setOpen] = useState(false);
 
@@ -253,46 +258,59 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
     return totalHour;
   };
 
-  const calculateTotalholidayAllowanceTime = (workerIndex: number): number => {
+  const calculateTotalholidayAllowanceTime = useCallback((workerIndex: number): number => {
+    if (!workers) return -1
+    if (!basicInfo) return -1
+
     let totalHolidayAllowance: number = 0;
-    props.workers[workerIndex].weeklyHours.forEach((weeklyHour) => {
+    workers[workerIndex].weeklyHours.forEach((weeklyHour) => {
       if (
         convertTimeStringtoNumber(weeklyHour) >=
-        props.holidayAllowanceMinimumWorkTime
+        basicInfo.holidayAllowanceMinimumWorkTime
       ) {
         totalHolidayAllowance +=
-          convertTimeStringtoNumber(weeklyHour) / props.weeklyWorkingDays;
+          convertTimeStringtoNumber(weeklyHour) / basicInfo.weeklyWorkingDays;
       }
     });
 
     return totalHolidayAllowance;
-  };
+  }, [workers, basicInfo])
 
-  const calculateDayNightWage = (workerIndex: number): number => {
+  const calculateDayNightWage = useCallback((workerIndex: number): number => {
+    if (!workers) return -1
+    if (!basicInfo) return -1
+
     let totalDayNightWage: number = 0;
     totalDayNightWage +=
-      convertTimeStringtoNumber(props.workers[workerIndex].dayNightHours[0]) *
-      props.workers[workerIndex].wage;
+      convertTimeStringtoNumber(workers[workerIndex].dayNightHours[0]) *
+      workers[workerIndex].wage;
     totalDayNightWage +=
-      convertTimeStringtoNumber(props.workers[workerIndex].dayNightHours[1]) *
-      props.minimumWage *
-      props.lateNightWorkMultiplier;
+      convertTimeStringtoNumber(workers[workerIndex].dayNightHours[1]) *
+      basicInfo.minimumWage *
+      basicInfo.lateNightWorkMultiplier;
 
     return totalDayNightWage;
-  };
+  }, [workers, basicInfo]);
 
-  const calculateTotalholidayAllowance = (workerIndex: number): number => {
-    return calculateTotalholidayAllowanceTime(workerIndex) * props.minimumWage;
-  };
+  const calculateTotalholidayAllowance = useCallback((workerIndex: number): number => {
+    if (!basicInfo) return -1
 
-  const calculateTotalWage = (): number => {
+    return calculateTotalholidayAllowanceTime(workerIndex) * basicInfo.minimumWage;
+  }, [basicInfo]);
+
+  const calculateTotalWage = useCallback((): number => {
+    if (!workers) return -1
+
     let totalWage: number = 0;
-    props.workers.forEach((worker, i) => {
+    workers.forEach((worker, i) => {
       totalWage += calculateDayNightWage(i) + calculateTotalholidayAllowance(i);
     });
 
     return totalWage;
-  };
+  }, [workers]);
+
+  useEffect(() => { console.log("Workers: ", workers) }, [workers, open])
+
 
   return (
     <>
@@ -473,8 +491,8 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
             </Box>
 
             {/* 리스트 값 */}
-            <List sx={{ marginTop: -1 }}>
-              {props.workers.map((info, i) => (
+            {!isWorkersLoading && <List sx={{ marginTop: -1 }}>
+              {workers?.map((info, i) => (
                 <Box key={i} display="flex" width="100%" height={50}>
                   {/* 번호 */}
                   <Box
@@ -485,7 +503,7 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
                     paddingTop={1}
                   >
                     <Typography variant="h6" align="center" fontWeight="bold">
-                      {i}
+                      {i + 1}
                     </Typography>
                   </Box>
                   {/* 이름 */}
@@ -589,7 +607,7 @@ const CalculateWageButton: React.FC<CalculateWageButtonProps> = (
                   />
                 </Box>
               ))}
-            </List>
+            </List>}
             <Box display="flex" flexDirection="column" marginLeft="980px">
               <Box
                 width={150}

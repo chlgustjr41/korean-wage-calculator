@@ -11,6 +11,7 @@ import {
 import { apidb, auth } from "../authentication/firebaseAuthentifcation";
 import { BasicInfo } from "../component/BasicInfo";
 import { WorkerInfo } from "../component/WorkerInfo";
+import { BASIC_INFO_ROUTE, WORKER_INFO_ROUTE } from "./apiRoutes";
 
 const dbRef = ref(getDatabase());
 
@@ -19,7 +20,7 @@ export async function pushBasicInfo(
   uid: string
 ): Promise<boolean> {
   return new Promise(function (resolve, reject) {
-    get(ref(apidb, "users/" + uid + "/basicInfo/"))
+    get(ref(apidb, BASIC_INFO_ROUTE.replace("{uid}", uid)))
       .then((snapshot) => {
         if (snapshot.exists()) {
           updateBasicInfo(info);
@@ -39,7 +40,7 @@ export async function pushWorkersInfo(
   uid: string
 ): Promise<boolean> {
   return new Promise(function (resolve, reject) {
-    get(ref(apidb, "users/" + uid + "/workersInfo/"))
+    get(ref(apidb, WORKER_INFO_ROUTE.replace("{uid}", uid)))
       .then((snapshot) => {
         if (snapshot.exists()) {
           updateWorkersInfo(workersInfo);
@@ -56,18 +57,10 @@ export async function pushWorkersInfo(
 
 export async function pullBasicInfo(uid: string): Promise<BasicInfo> {
   return new Promise(function (resolve, reject) {
-    get(child(dbRef, "users/" + uid + "/basicInfo/"))
+    get(child(dbRef, BASIC_INFO_ROUTE.replace("{uid}", uid)))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          let data = snapshot.val();
-          let basicInfo: BasicInfo = {
-            minimumWage: data["minimumWage"],
-            lateNightWorkMultiplier: data["lateNightWorkMultiplier"],
-            holidayAllowanceMinimumWorkTime:
-              data["holidayAllowanceMinimumWorkTime"],
-            weeklyWorkingDays: data["weeklyWorkingDays"],
-          };
-          resolve(basicInfo);
+          resolve(snapshot.val());
         } else {
           reject("Basic information do not exist");
         }
@@ -80,11 +73,10 @@ export async function pullBasicInfo(uid: string): Promise<BasicInfo> {
 
 export async function pullWorkersInfo(uid: string): Promise<Array<WorkerInfo>> {
   return new Promise(function (resolve, reject) {
-    get(child(dbRef, "users/" + uid + "/workersInfo/"))
+    get(child(dbRef, WORKER_INFO_ROUTE.replace("{uid}", uid)))
       .then((snapshot) => {
         if (snapshot.exists()) {
-          let data: WorkerInfo[] = snapshot.val()["workers"];
-          resolve(data);
+          resolve(snapshot.val()["workers"]);
         } else {
           reject("Workers information do not exist");
         }
@@ -96,43 +88,44 @@ export async function pullWorkersInfo(uid: string): Promise<Array<WorkerInfo>> {
 }
 
 async function updateBasicInfo(info: BasicInfo) {
-  set(ref(apidb, "users/" + auth.currentUser?.uid + "/basicInfo/"), {
-    minimumWage: info.minimumWage,
-    lateNightWorkMultiplier: info.lateNightWorkMultiplier,
-    holidayAllowanceMinimumWorkTime: info.holidayAllowanceMinimumWorkTime,
-    weeklyWorkingDays: info.weeklyWorkingDays,
-  });
+  if (auth.currentUser) {
+    set(ref(apidb, BASIC_INFO_ROUTE.replace("{uid}", auth.currentUser.uid)), {
+      minimumWage: info.minimumWage,
+      lateNightWorkMultiplier: info.lateNightWorkMultiplier,
+      holidayAllowanceMinimumWorkTime: info.holidayAllowanceMinimumWorkTime,
+      weeklyWorkingDays: info.weeklyWorkingDays,
+    });
+  }
 }
 
 async function updateWorkersInfo(info: WorkerInfo[]) {
-  set(ref(apidb, "users/" + auth.currentUser?.uid + "/workersInfo/"), {
-    workers: JSON.parse(JSON.stringify(info)),
-  });
+  if (auth.currentUser) {
+    set(ref(apidb, WORKER_INFO_ROUTE.replace("{uid}", auth.currentUser.uid)), {
+      workers: JSON.parse(JSON.stringify(info)),
+    });
+  }
 }
 
 async function addBasicInfo(info: BasicInfo) {
-  const basicInfo = {
-    minimumWage: info.minimumWage,
-    lateNightWorkMultiplier: info.lateNightWorkMultiplier,
-    holidayAllowanceMinimumWorkTime: info.holidayAllowanceMinimumWorkTime,
-    weeklyWorkingDays: info.weeklyWorkingDays,
-  };
+  if (auth.currentUser) {
+    const updates = {
+      [BASIC_INFO_ROUTE.replace("{uid}", auth.currentUser.uid)]: info
+    };
 
-  const updates = {};
-  (updates as any)["users/" + auth.currentUser?.uid + "/basicInfo/"] =
-    basicInfo;
-
-  update(ref(apidb), updates);
+    update(ref(apidb), updates);
+  }
 }
 
 async function addWorkersInfo(info: WorkerInfo[]) {
-  const workersInfo = {
-    workers: JSON.parse(JSON.stringify(info)),
-  };
+  if (auth.currentUser) {
+    const workersInfo = {
+      workers: JSON.parse(JSON.stringify(info)),
+    };
 
-  const updates = {};
-  (updates as any)["users/" + auth.currentUser?.uid + "/workersInfo/"] =
-    workersInfo;
+    const updates = {
+      [WORKER_INFO_ROUTE.replace("{uid}", auth.currentUser.uid)]: workersInfo
+    };
 
-  update(ref(apidb), updates);
+    update(ref(apidb), updates);
+  }
 }

@@ -7,33 +7,40 @@ import { ThemeProvider } from "@mui/material";
 import { theme } from "./theme/theme";
 import AlreadyLoggedInRoute from "./route/AlreadyLoggedInRoute";
 import AuthRoute from "./route/AuthRoute";
+import 'tailwindcss/tailwind.css'
+import "./style.css"
+import { QueryClient, QueryClientProvider } from "react-query";
+
 
 const App: React.FC = () => {
+  const queryClient = new QueryClient()
   return (
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <AlreadyLoggedInRoute>
-                <LoginPage />
-              </AlreadyLoggedInRoute>
-            }
-          />
-        </Routes>
-        <Routes>
-          <Route
-            path="/calculator"
-            element={
-              <AuthRoute>
-                <CalculatorPage />
-              </AuthRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <AlreadyLoggedInRoute>
+                  <LoginPage />
+                </AlreadyLoggedInRoute>
+              }
+            />
+          </Routes>
+          <Routes>
+            <Route
+              path="/calculator"
+              element={
+                <AuthRoute>
+                  <CalculatorPage />
+                </AuthRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 

@@ -33,9 +33,9 @@ export const MainMenuPanel: React.FC = () => {
               info.holidayAllowanceMinimumWorkTime.toString()
             );
             setWeeklyWorkingDays(info.weeklyWorkingDays.toString());
-            setLoading(false);
           },
           (errorStr) => {
+            console.log({ errorStr })
             if (errorStr.indexOf("do not exist") !== -1) {
               pushBasicInfo(
                 {
@@ -45,12 +45,11 @@ export const MainMenuPanel: React.FC = () => {
                   weeklyWorkingDays: 0,
                 },
                 uid
-              ).then(() => {
-                setLoading(false);
-              });
+              )
             }
           }
-        );
+        )
+          .then(() => { setLoading(false); });
       }
     });
   }, []);

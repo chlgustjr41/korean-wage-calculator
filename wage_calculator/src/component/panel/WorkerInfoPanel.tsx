@@ -59,6 +59,7 @@ export const WorkerInfoPanel: React.FC = () => {
       wage: wage,
       weeklyHours: ["", "", "", "", "", ""],
       dayNightHours: ["", ""],
+      holidayHour: [""]
     });
     setWorkers(array);
     setIsChanged(true);
@@ -71,6 +72,7 @@ export const WorkerInfoPanel: React.FC = () => {
       wage: wage,
       weeklyHours: workers[index].weeklyHours,
       dayNightHours: workers[index].dayNightHours,
+      holidayHour: workers[index].holidayHour
     };
     setWorkers(array);
     setIsChanged(true);
@@ -105,7 +107,7 @@ export const WorkerInfoPanel: React.FC = () => {
                 paddingTop={1}
               >
                 <Typography variant="h6" align="center" fontWeight="bold">
-                  {i}
+                  {i + 1}
                 </Typography>
               </Box>
               <Box

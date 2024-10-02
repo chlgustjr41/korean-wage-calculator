@@ -193,8 +193,8 @@ export const WorkerScheduleInputPanel: React.FC = () => {
           </Box>
           <Box
             display="flex"
-            width={200}
-            minWidth={200}
+            width={325}
+            minWidth={325}
             bgcolor={theme.palette.background.paper}
           >
             <Box width={90} border={1}>
@@ -205,6 +205,11 @@ export const WorkerScheduleInputPanel: React.FC = () => {
             <Box width={110} border={1}>
               <Typography variant="h6" align="center" fontWeight="bold">
                 야간 근무 시간
+              </Typography>
+            </Box>
+            <Box width={125} border={1}>
+              <Typography variant="h6" align="center" fontWeight="bold" >
+                공휴일 추가 수당 시간 <label title="총합 근무시간에 포함되지 않습니다.">*</label>
               </Typography>
             </Box>
           </Box>
@@ -392,10 +397,10 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                   </Typography>
                 </Box>
 
-                {/* 낮 야간 시간 */}
+                {/* 낮 야간 공휴일 시간 */}
                 <Box
                   display="flex"
-                  width={200}
+                  width={325}
                   bgcolor={theme.palette.background.default}
                 >
                   <Box
@@ -438,6 +443,26 @@ export const WorkerScheduleInputPanel: React.FC = () => {
                       />
                     </Box>
                   </Box>
+                  <Box
+                    width={125}
+                    border={1}
+                    display="flex"
+                    justifyContent="center"
+                  >
+                    <Box
+                      display="flex"
+                      flexDirection="column"
+                      justifyContent="center"
+                    >
+                      <InsertTimeButton
+                        type="Holiday"
+                        workerTimeInfo={workers[i].holidayHour ?? [""]}
+                        workerIndex={i}
+                        timeIndex={0}
+                        handleInsertTime={handleInsertDayNightTime}
+                      />
+                    </Box>
+                  </Box>
                 </Box>
 
                 {/* 총합 시간 2 */}
@@ -465,7 +490,7 @@ export const WorkerScheduleInputPanel: React.FC = () => {
             lateNightWorkMultiplier={+lateNightWorkMultiplier}
             holidayAllowanceMinimumWorkTime={+holidayAllowanceMinimumWorkTime}
             weeklyWorkingDays={+weeklyWorkingDays}
-            // downloadWorkerSchedule={downloadWorkerSchedule}
+          // downloadWorkerSchedule={downloadWorkerSchedule}
           />
         </Box>
       </Box>

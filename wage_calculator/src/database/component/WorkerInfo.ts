@@ -3,4 +3,5 @@ export interface WorkerInfo {
   wage: number;
   weeklyHours: string[];
   dayNightHours: string[];
+  holidayHour: string[];
 }
